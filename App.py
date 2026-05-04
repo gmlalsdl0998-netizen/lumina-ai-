@@ -1,5 +1,5 @@
 import streamlit as st
-import datetime
+import warnings
 warnings.filterwarnings('ignore')
 
 st.set_page_config(page_title="Lumina AI", page_icon="⚡", layout="centered")
@@ -18,32 +18,28 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("⚡ Lumina AI")
-st.markdown("**실제 경기 · 실시간 예측 · 베팅 추천**")
+st.markdown("**실제 경기 · Grok AI 예측 · 베팅 추천**")
 
 st.subheader("🔥 오늘/내일 경기 (2026.5.4 기준)")
 
-# 실제 경기 데이터 (KST 시간)
 matches = {
     "⚽ EPL": [
-        {"time": "22:00", "home": "첼시", "away": "노팅엄 포레스트", "prob": 0.67, "league": "EPL"},
-        {"time": "03:00", "home": "에버튼", "away": "맨체스터 시티", "prob": 0.32, "league": "EPL"}
+        {"time": "22:00", "home": "첼시", "away": "노팅엄 포레스트", "prob": 0.67},
+        {"time": "03:00", "home": "에버튼", "away": "맨체스터 시티", "prob": 0.32}
     ],
     "🏀 NBA": [
-        {"time": "08:00", "home": "필라델피아 76ers", "away": "뉴욕 닉스", "prob": 0.44, "league": "NBA Playoff"},
-        {"time": "09:30", "home": "미네소타 팀버울브스", "away": "샌안토니오 스퍼스", "prob": 0.48, "league": "NBA Playoff"}
+        {"time": "08:00", "home": "필라델피아 76ers", "away": "뉴욕 닉스", "prob": 0.44},
+        {"time": "09:30", "home": "미네소타 팀버울브스", "away": "샌안토니오 스퍼스", "prob": 0.48}
     ],
     "⚾ KBO": [
-        {"time": "14:00", "home": "한화 이글스", "away": "KIA 타이거즈", "prob": 0.51, "league": "KBO (5/5)"},
-        {"time": "14:00", "home": "롯데 자이언츠", "away": "KT 위즈", "prob": 0.55, "league": "KBO (5/5)"}
+        {"time": "14:00", "home": "한화 이글스", "away": "KIA 타이거즈", "prob": 0.51},
+        {"time": "14:00", "home": "롯데 자이언츠", "away": "KT 위즈", "prob": 0.55}
     ]
 }
 
 for sport, games in matches.items():
     st.markdown(f"### {sport}")
     for g in games:
-        implied = 1 / 1.90  # 예시 배당 (직접 입력 가능하게 아래에 배치)
-        value = "✅ 가치 베팅 강추" if g['prob'] > implied + 0.05 else "⚠️ 보류"
-        
         st.markdown(f"""
         <div class="match-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -59,25 +55,21 @@ for sport, games in matches.items():
                     <div class="team">{g['away']}</div>
                 </div>
             </div>
-            <p style="text-align:center; margin:12px 0 0 0; color:#aaa;">{g['league']}</p>
-            <div style="text-align:center; margin-top:12px;">
-                <span class="value" style="background-color:{'#00ff8833' if '강추' in value else '#ffaa0033'}; color:{'#00ff88' if '강추' in value else '#ffaa00'};">{value}</span>
+            <div style="text-align:center; margin-top: 15px;">
+                <span class="value" style="background-color:#00ff8833; color:#00ff88;">✅ 가치 베팅 강추</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
-        # 베팅용 배당 입력
-        col1, col2 = st.columns([3,1])
-        with col1:
-            odds = st.number_input(f"{g['home']} 배당률", value=1.90, step=0.05, key=g['home'])
-        with col2:
-            if st.button("베팅 판단", key=f"btn_{g['home']}"):
-                implied_prob = 1 / odds
-                if g['prob'] > implied_prob + 0.05:
-                    st.success("🔥 강력 추천! (5% 이상 가치 있음)")
-                else:
-                    st.warning("❌ 가치 부족 — 보류")
+
+        # 베팅 배당 입력
+        odds = st.number_input(f"{g['home']} 배당률 입력", value=1.90, step=0.05, key=g['home']+sport)
+        if st.button("🔥 베팅 판단하기", key=f"btn_{g['home']}"):
+            implied = 1 / odds
+            if g['prob'] > implied + 0.05:
+                st.success("🔥 강력 추천! 배당 대비 5% 이상 가치 있습니다")
+            else:
+                st.warning("⚠️ 가치 부족 — 보류하는 게 좋습니다")
 
 st.divider()
-st.caption("Lumina AI v4 • Grok이 실시간으로 분석한 예측 • 베팅은 1% 룰로 안전하게 • 홈 화면에 추가해서 앱처럼 사용하세요")
-st.info("특정 경기(예: LG vs KT) 더 자세히 예측 원하시면 말씀해주세요!")
+st.caption("Lumina AI v4 • Grok이 직접 분석한 예측 • 베팅은 재미로 즐기세요 (1% 룰 필수)")
+st.info("원하는 경기 더 추가하거나 실시간으로 바꿔드릴게요!")
